@@ -8,40 +8,50 @@ const wireSpecs = file.split("\n")
 const wire1 = wireSpecs[0].split(",");
 const wire2 = wireSpecs[1].split(",");
 
-const wire1Coords = coordsTakenByWire(wire1);
-const wire2Coords = coordsTakenByWire(wire2);
+const wire1Coords = getCoords(wire1);
+const wire2Coords = getCoords(wire2);
 
+// wire1Coords intersection wire2Coords
 const overlappingCoords = intersection(wire1Coords, wire2Coords, eq);
 
-// by manhattan distance from small to large
-const sortedOverlaps = overlappingCoords.sort(([x1,y1], [x2,y2]) => {
-    return x1 + y1 < x2 + y2;
+// sort intersections by manhattan distance from origin
+const sortedOverlaps = overlappingCoords.sort(([x1, y1], [x2, y2]) => {
+    return (Math.abs(x1) + Math.abs(y1)) - (Math.abs(x2) + Math.abs(y2));
 });
 
-console.log(sortedOverlaps[0]);
+// get smallest coord
+console.log(sortedOverlaps);
+const closestOverlapToOrigin = sortedOverlaps[0];
 
-function coordsTakenByWire(wire) {
+// output its manhattan distance from the origin
+const [x, y] = closestOverlapToOrigin;
+console.log(Math.abs(x) + Math.abs(y));
+
+function getCoords(wire) {
+    const coords = [];
     let x = 0;
     let y = 0;
-
-    const coords = [];
 
     for (const move of wire) {
         const dir = move[0];
         const dist = parseInt(move.substr(1));
 
-        switch (dir) {
-            case "L": x -= dist;
-            break;
-            case "R": x += dist;
-            break;
-            case "U": y += dist;
-            break;
-            case "D": y -= dist;
-            break;
-        }
+        // 1 to dist inclusive
+        for (let stepsToDist = 1; stepsToDist <= dist; stepsToDist++) {
+            if (dir === "R") {
+                x++;
+            } else if (dir === "L") {
+                x--;
+            } else if (dir === "U") {
+                y++;
+            } else if (dir === "D") {
+                y--;
+            } else {
+                throw new Error();
+            }
 
-        coords.push([x,y]);
+            coords.push([x, y]);
+        }
     }
 
     return coords;
