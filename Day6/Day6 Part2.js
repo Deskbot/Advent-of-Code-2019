@@ -12,6 +12,8 @@ const bodies = new Set(
         .flat()
 );
 
+// build graph
+
 const directOrbitGraph = new Digraph();
 
 bodies.forEach(body => directOrbitGraph.addNode(body))
@@ -21,18 +23,47 @@ for (const orbit of orbits) {
     directOrbitGraph.addEdge(nom, acc);
 }
 
-let totalOrbits = 0;
+// find paths
 
-for (const body of bodies) {
-    totalOrbits += childCount(directOrbitGraph, body);
+const pathToMe = findPath(directOrbitGraph, "COM", "YOU");
+const pathToSanta = findPath(directOrbitGraph, "COM", "SAN");
+
+const { same, left, right } = splitWhereDifferent(pathToMe, pathToSanta);
+
+const pathFromMeToSanta = [...left.reverse(), same[same.length - 1], ...right];
+
+// ignore me and santa (-2)
+// we are counting edges, but the array is of nodes (-1)
+console.log(pathFromMeToSanta.length - 3);
+
+function findPath(graph, start, end) {
+    for (const child of graph.childrenOf(start)) {
+        if (child === end) {
+            return [start, end];
+        }
+
+        const pathToEndFromChild = findPath(graph, child, end);
+
+        if (pathToEndFromChild) {
+            return [start, ...pathToEndFromChild]
+        }
+    }
+
+    return undefined;
 }
 
-function childCount(graph, node) {
-    const children = [...graph.childrenOf(node)];
-    return children.length
-        + children
-            .map(child => childCount(graph, child))
-            .reduce((tot, curr) => tot + curr, 0);
-}
+function splitWhereDifferent(left, right) {
+    const same = [];
 
-console.log(totalOrbits);
+    for (var i = 0; i < Math.min(left.length, right.length); i++) {
+        if (left[i] === right[i]) {
+            same.push(left[i]);
+        } else {
+            return {
+                same,
+                left: left.slice(i),
+                right: right.slice(i),
+            };
+        }
+    }
+}
