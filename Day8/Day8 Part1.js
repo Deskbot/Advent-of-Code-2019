@@ -15,14 +15,18 @@ while (image.length > 0) {
     layers.push(image.splice(0, pixelsInLayer));
 }
 
-layers.sort((layer1, layer2) => {
-    return countEqual(layer1, 0) - countEqual(layer2, 0);
-});
-
-const layerWithFewestZeros = layers[0];
-
-console.log(countEqual(layerWithFewestZeros, 1) * countEqual(layerWithFewestZeros, 2));
+part1(layers.slice());
 
 function countEqual(arr, valToEqual) {
     return arr.filter(val => val === valToEqual).length;
+}
+
+function part1(layers) {
+    layers.sort((layer1, layer2) => {
+        return countEqual(layer1, 0) - countEqual(layer2, 0);
+    });
+
+    const layerWithFewestZeros = layers[0];
+
+    console.log(countEqual(layerWithFewestZeros, 1) * countEqual(layerWithFewestZeros, 2));
 }
