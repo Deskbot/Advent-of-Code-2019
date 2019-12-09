@@ -6,7 +6,6 @@ class Program {
             this.state.set(i, state);
         });
         this.inputs = [];
-        this.halted = false;
         this.relativeBase = 0;
     }
 
@@ -27,7 +26,7 @@ class Program {
         return 0;
     }
 
-    runUntilOutput() {
+    *run() {
         if (this.halted) return;
 
         while (true) {
@@ -38,7 +37,6 @@ class Program {
             const positionMode3 = Math.floor((command % 100000) / 10000);
 
             if (opCode == 99) {
-                this.halted = true;
                 return;
             }
 
@@ -73,7 +71,7 @@ class Program {
             } else if (opCode === 4) {
                 const operandAddress = this.read(this.address + 1);
                 this.address += 2;
-                return this.getValue(positionMode1, operandAddress);
+                yield this.getValue(positionMode1, operandAddress);
 
             } else if (opCode === 5 || opCode === 6) {
                 const param1 = this.read(this.address + 1);
