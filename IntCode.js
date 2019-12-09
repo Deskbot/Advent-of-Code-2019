@@ -4,6 +4,7 @@ class Program {
         this.state = initialState;
         this.inputs = [];
         this.halted = false;
+        this.relativeBase = 0;
     }
 
     input(...vals) {
@@ -72,10 +73,22 @@ class Program {
                     }
                 }
 
+            } else if (opCode === 9) {
+                const param = this.state[this.address + 1];
+                this.relativeBase += this.getValue(positionMode1, param);
+                this.address += 1;
+
             } else {
                 throw `Unrecognised opcode ${opCode} at address ${this.address} in program ${this.state}.`;
             }
         }
+    }
+
+    getValue(addressMode, param) {
+        if (addressMode === 0) return this.state[param];
+        if (addressMode === 1) return param;
+        if (addressMode === 2) return this.state[param + this.relativeBase];
+        throw `Unexpected addressMode ${addressMode} in program ${this}`;
     }
 }
 
