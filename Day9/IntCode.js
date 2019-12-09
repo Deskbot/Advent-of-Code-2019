@@ -46,6 +46,7 @@ class Program {
                 const param3 = this.read(this.address + 3);
                 const operand1 = this.getValue(positionMode1, param1);
                 const operand2 = this.getValue(positionMode2, param2);
+                // const targetAddress = this.getValue(positionMode3, param3);
                 const targetAddress = param3;
                 this.address += 4;
 
@@ -64,7 +65,7 @@ class Program {
                 this.state.set(targetAddress, toSet);
 
             } else if (opCode === 3) {
-                const operandAddress = this.getValue(positionMode1, this.address + 1);
+                const operandAddress = this.getValue(positionMode1, this.read(this.address + 1));
                 this.state.set(operandAddress, this.inputs.shift());
                 this.address += 2;
 
