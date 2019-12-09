@@ -7,15 +7,28 @@ class Program {
         this.relativeBase = 0;
     }
 
+    getValue(addressMode, param) {
+        if (addressMode === 0) return this.state[param];
+        if (addressMode === 1) return param;
+        if (addressMode === 2) return this.state[param + this.relativeBase];
+        throw `Unexpected addressMode ${addressMode} in program ${JSON.stringify(this)}`;
+    }
+
     input(...vals) {
         this.inputs.push(...vals);
+    }
+
+    read(address) {
+        if (this.state[address]) return this.state[address];
+
+        return 0;
     }
 
     runUntilOutput() {
         if (this.halted) return;
 
         while (true) {
-            const command = this.state[this.address];
+            const command = this.read(this.address);
             const opCode = command % 100;
             const positionMode1 = command % 1000 - opCode;
             const positionMode2 = command % 10000 - positionMode1 - opCode;
@@ -27,13 +40,13 @@ class Program {
             }
 
             if (opCode === 1 || opCode === 2 || opCode === 7 || opCode === 8) {
-                const param1 = this.state[this.address + 1];
-                const param2 = this.state[this.address + 2];
-                const param3 = this.state[this.address + 3];
-                const operand1 = positionMode1 === 0 ? this.state[param1] : param1;
-                const operand2 = positionMode2 === 0 ? this.state[param2] : param2;
-                // const targetAddress = positionMode3 === 0 ? this.state[param3]: param3;
-                const targetAddress = this.state[this.address + 3];
+                const param1 = this.read(this.address + 1);
+                const param2 = this.read(this.address + 2);
+                const param3 = this.read(this.address + 3);
+                const operand1 = positionMode1 === 0 ? this.read(param1) : param1;
+                const operand2 = positionMode2 === 0 ? this.read(param2) : param2;
+                // const targetAddress = positionMode3 === 0 ? this.read(param3): param3;
+                const targetAddress = this.read(this.address + 3);
                 this.address += 4;
 
                 if (opCode === 1) {
@@ -47,20 +60,20 @@ class Program {
                 }
 
             } else if (opCode === 3) {
-                const operandAddress = this.state[this.address + 1];
+                const operandAddress = this.read(this.address + 1);
                 this.state[operandAddress] = this.inputs.shift();
                 this.address += 2;
 
             } else if (opCode === 4) {
-                const operandAddress = this.state[this.address + 1];
+                const operandAddress = this.read(this.address + 1);
                 this.address += 2;
-                return this.state[operandAddress];
+                return this.read(operandAddress);
 
             } else if (opCode === 5 || opCode === 6) {
-                const param1 = this.state[this.address + 1];
-                const param2 = this.state[this.address + 2];
-                const testParam = positionMode1 === 0 ? this.state[param1] : param1;
-                const goToParam = positionMode2 === 0 ? this.state[param2] : param2;
+                const param1 = this.read(this.address + 1);
+                const param2 = this.read(this.address + 2);
+                const testParam = positionMode1 === 0 ? this.read(param1) : param1;
+                const goToParam = positionMode2 === 0 ? this.read(param2) : param2;
                 this.address += 3;
 
                 if (opCode === 5) {
@@ -74,7 +87,7 @@ class Program {
                 }
 
             } else if (opCode === 9) {
-                const param = this.state[this.address + 1];
+                const param = this.read(this.address + 1);
                 this.relativeBase += this.getValue(positionMode1, param);
                 this.address += 1;
 
@@ -82,13 +95,6 @@ class Program {
                 throw `Unrecognised opcode ${opCode} at address ${this.address} in program ${this.state}.`;
             }
         }
-    }
-
-    getValue(addressMode, param) {
-        if (addressMode === 0) return this.state[param];
-        if (addressMode === 1) return param;
-        if (addressMode === 2) return this.state[param + this.relativeBase];
-        throw `Unexpected addressMode ${addressMode} in program ${this}`;
     }
 }
 
