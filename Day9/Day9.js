@@ -1,5 +1,5 @@
 const fs = require("fs");
-const { Program } = require("../IntCode");
+const { Program } = require("./IntCode");
 
 const file = fs.readFileSync("input.txt").toString();
 const program = file.split(",")
