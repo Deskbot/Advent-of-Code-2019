@@ -46,9 +46,9 @@ class Line {
     }
 }
 
-main();
+part1();
 
-function main() {
+function part1() {
     const file = fs.readFileSync("input.txt").toString();
     const grid = file.split("\n")
         .filter(line => line !== "")
