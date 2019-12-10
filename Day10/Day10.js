@@ -45,27 +45,27 @@ class Line {
         return (Math.atan(this.yLen / this.xLen)
             * sign
             + rotate
-            // + 2 * Math.PI
-        );
+            + 2 * Math.PI
+        ) % (2 * Math.PI);
     }
 
     get xLen() {
-        return this.x1 - this.x2;
+        return this.x2 - this.x1;
     }
 
     get yLen() {
-        return this.y1 - this.y2;
+        return this.y2 - this.y1;
     }
 }
 
-const file = fs.readFileSync("input5.txt").toString();
+const file = fs.readFileSync("input.txt").toString();
 const grid = file.split("\n")
     .filter(line => line !== "")
     .map(line => line.split(""));
 
 const asteroids = [];
-for (const [y, col] of grid.entries()) {
-    for (const [x, content] of col.entries()) {
+for (const [y, row] of grid.entries()) {
+    for (const [x, content] of row.entries()) {
         if (content === "#") {
             asteroids.push([x, y]);
         }
