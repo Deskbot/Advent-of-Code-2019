@@ -9,7 +9,40 @@ class Line {
     }
 
     get angle() {
-        return Math.atan((this.x1 - this.x2) / (this.y1 - this.y2)); // angle from x direction anti-clockwise
+        // const xIsNeg = (this.x1 - this.x2) < 0;
+        // const yIsNeg = (this.y1 - this.y2) < 0;
+
+        // // angle above the x-axis from origin (below when negative)
+        // const angle = Math.atan((this.x1 - this.x2) / (this.y1 - this.y2));
+
+        // if (xIsNeg) {
+        //     if (yIsNeg) {
+        //         return Math.PI + angle;
+        //     }
+
+        //     return Math.PI - angle;
+        // }
+
+        // return angle;
+
+        const xIsNeg = (this.x1 - this.x2) < 0;
+        const yIsNeg = (this.y1 - this.y2) < 0;
+
+        let angle = (this.x1 - this.x2) / (this.y1 - this.y2);
+
+        if (!xIsNeg && !yIsNeg) {
+            return angle;
+        }
+
+        if (xIsNeg && !yIsNeg) {
+            return angle + Math.PI / 2;
+        }
+
+        if (!xIsNeg && yIsNeg) {
+            return angle + 3 * Math.PI / 2;
+        }
+
+        return angle + Math.PI;
     }
 }
 
@@ -22,8 +55,8 @@ function main() {
         .map(line => line.split(""));
 
     const asteroids = [];
-    for (const [x, row] of grid.entries()) {
-        for (const [y, content] of row.entries()) {
+    for (const [y, col] of grid.entries()) {
+        for (const [x, content] of col.entries()) {
             if (content === "#") {
                 asteroids.push([x, y]);
             }
