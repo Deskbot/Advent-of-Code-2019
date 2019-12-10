@@ -15,13 +15,10 @@ program.forEach(int => {
     }
 })
 
-const p = new Program(program);
-p.input(1);
-// const program2 = "1102,34915192,34915192,7,4,7,99,0"
-//     .split(",")
-//     .map(str => parseInt(str))
-// const p = new Program(program2);
+const p1 = new Program(program);
+p1.input(1);
+const p2 = new Program(program);
+p2.input(2);
 
-const runner = p.run();
-
-console.log(...runner);
+console.log(...p1.run());
+console.log(...p2.run());
