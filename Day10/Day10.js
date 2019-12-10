@@ -9,7 +9,7 @@ class Line {
     }
 
     get angle() {
-        return Math.atan((x1 - x2) / (y1 - y2)); // angle from x direction anti-clockwise
+        return Math.atan((this.x1 - this.x2) / (this.y1 - this.y2)); // angle from x direction anti-clockwise
     }
 }
 
@@ -30,9 +30,24 @@ function main() {
         }
     }
 
-    for (const asteroid of asteroids) {
+    // compare angle of each asteroid to all the others
+    // count unique angles
+    let bestAsteroid;
+    let mostAngles = -Infinity;
+    for (const candidateAsteroid of asteroids) {
+        const angles = new Set();
+        for (const otherAsteroid of asteroids) {
+            if (candidateAsteroid === otherAsteroid) continue;
 
+            const { angle } = new Line(candidateAsteroid, otherAsteroid);
+            angles.add(angle);
+        }
+
+        if (angles.size > mostAngles) {
+            mostAngles = angles.size;
+            bestAsteroid = candidateAsteroid;
+        }
     }
 
-    console.log(asteroids)
+    console.log(bestAsteroid, mostAngles);
 }
