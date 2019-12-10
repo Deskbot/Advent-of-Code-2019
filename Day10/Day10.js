@@ -11,42 +11,42 @@ class Line {
     }
 
     get angle() {
-        // const xIsNeg = (this.x1 - this.x2) < 0;
-        // const yIsNeg = (this.y1 - this.y2) < 0;
-
-        // // angle above the x-axis from origin (below when negative)
-        // const angle = Math.atan((this.x1 - this.x2) / (this.y1 - this.y2));
-
-        // if (xIsNeg) {
-        //     if (yIsNeg) {
-        //         return Math.PI + angle;
-        //     }
-
-        //     return Math.PI - angle;
-        // }
-
-        // return angle;
-
-        const xIsNeg = (this.x1 - this.x2) < 0;
-        const yIsNeg = (this.y1 - this.y2) < 0;
+        const xIsNeg = this.xLen < 0;
+        const yIsNeg = this.yLen < 0;
         const xIsPos = !xIsNeg;
         const yIsPos = !yIsNeg;
 
-        let angle = (this.x1 - this.x2) / (this.y1 - this.y2);
+        let sign, rotate;
 
         if (xIsPos && yIsPos) {
-            return angle;
+            sign = -1;
+            rotate = -Math.PI / 2;
         }
 
-        if (xIsPos && yIsNeg) {
-            return angle + Math.PI / 2;
+        else if (xIsPos && yIsNeg) {
+            sign = -1;
+            rotate = Math.PI / 2;
         }
 
-        if (xIsNeg && yIsNeg) {
-            return angle + Math.PI;
+        else if (xIsNeg && yIsNeg) {
+            sign = 1;
+            rotate = - 3 * Math.PI / 2;
         }
 
-        return angle + 3 * Math.PI / 2;
+        else {
+            sign = 1;
+            rotate = 3 * Math.PI / 2;
+        }
+
+        return Math.atan(this.xLen / this.yLen) * sign + rotate;
+    }
+
+    get xLen() {
+        return this.x1 - this.x2;
+    }
+
+    get yLen() {
+        return this.y1 - this.y2;
     }
 }
 
@@ -113,7 +113,7 @@ function part2(baseAsteroid) {
 
     // closest to furthest
     otherAsteroids.sort((a1,a2) => {
-        return - distance(baseAsteroid, a1) + distance(baseAsteroid, a2);
+        return distance(baseAsteroid, a1) - distance(baseAsteroid, a2);
     });
 
     // angles to a list of asteroid at that angle
