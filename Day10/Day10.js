@@ -20,7 +20,7 @@ class Line {
 
         if (xIsPos && yIsPos) {
             sign = -1;
-            rotate = -Math.PI / 2;
+            rotate = Math.PI / 2;
         }
 
         else if (xIsPos && yIsNeg) {
@@ -30,7 +30,7 @@ class Line {
 
         else if (xIsNeg && yIsNeg) {
             sign = 1;
-            rotate = - 3 * Math.PI / 2;
+            rotate = 3 * Math.PI / 2;
         }
 
         else {
@@ -38,7 +38,11 @@ class Line {
             rotate = 3 * Math.PI / 2;
         }
 
-        return Math.atan(this.xLen / this.yLen) * sign + rotate;
+        return (Math.atan(this.yLen / this.xLen)
+            * sign
+            + rotate
+            // + 2 * Math.PI
+        );
     }
 
     get xLen() {
