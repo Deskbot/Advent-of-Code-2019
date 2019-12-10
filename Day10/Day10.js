@@ -29,26 +29,28 @@ class Line {
 
         const xIsNeg = (this.x1 - this.x2) < 0;
         const yIsNeg = (this.y1 - this.y2) < 0;
+        const xIsPos = !xIsNeg;
+        const yIsPos = !yIsNeg;
 
         let angle = (this.x1 - this.x2) / (this.y1 - this.y2);
 
-        if (!xIsNeg && !yIsNeg) {
+        if (xIsPos && yIsPos) {
             return angle;
         }
 
-        if (xIsNeg && !yIsNeg) {
+        if (xIsPos && yIsNeg) {
             return angle + Math.PI / 2;
         }
 
-        if (!xIsNeg && yIsNeg) {
-            return angle + 3 * Math.PI / 2;
+        if (xIsNeg && yIsNeg) {
+            return angle + Math.PI;
         }
 
-        return angle + Math.PI;
+        return angle + 3 * Math.PI / 2;
     }
 }
 
-const file = fs.readFileSync("input.txt").toString();
+const file = fs.readFileSync("input5.txt").toString();
 const grid = file.split("\n")
     .filter(line => line !== "")
     .map(line => line.split(""));
@@ -67,7 +69,12 @@ const [baseAsteroid, mostAngles] = part1();
 console.log(baseAsteroid, mostAngles);
 
 const orderOfDestruction = part2(baseAsteroid);
-console.log(orderOfDestruction[199]);
+console.log(orderOfDestruction[199], orderOfDestruction);
+
+fs.writeFileSync("test.txt", orderOfDestruction
+    .map(([x,y],i)=>`${i.toString().padStart(4)}: ${x},${y}`)
+    .join("\n")
+);
 
 function distance([x1,y1], [x2,y2]) {
     return Math.sqrt(
