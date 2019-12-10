@@ -10,6 +10,10 @@ class Line {
         this.y2 = y2;
     }
 
+    // think about how the atan output would relate to the actual
+    // from north clockwise
+    // could have translated the points 90° anti-clockwise
+    // then used regular atan
     get angle() {
         const xIsNeg = this.xLen < 0;
         const yIsNeg = this.yLen < 0;
