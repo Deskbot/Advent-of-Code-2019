@@ -40,6 +40,17 @@ class Grid {
         }
         return tot;
     }
+
+    get minX() {
+        return [...this.grid.keys()].sort()[0];
+    }
+
+    get minY() {
+        return [...this.grid.keys()]
+            .map(x => this.grid.get(x)) // list of y maps
+            .map(ymap => [...ymap.keys()].sort(lowHigh)[0]) // list of minys
+            .sort(lowHigh)[0]; // miny
+    }
 }
 
 class Robot {
@@ -97,6 +108,10 @@ class Robot {
 part1();
 part2();
 
+function lowHigh(a, b) {
+    return a - b;
+}
+
 function part1() {
     const grid = new Grid();
     const brain = new Program(code);
@@ -149,13 +164,16 @@ function part2() {
         brain.input(grid.get(robot.x, robot.y));
     }
 
+    const { minX, minY } = grid;
+    let yOffset = minY < 0 ? Math.abs(minY) : 0;
     const imageData = [];
-    for (const x of grid.grid.keys()) {
+    for (const x of [...grid.grid.keys()].sort(lowHigh)) {
         const ys = []
         for (const y of grid.grid.get(x).keys()) {
-            ys[y] = grid.grid.get(x).get(y) === 0 ? " " : "█";
+            ys[y + yOffset] = grid.grid.get(x).get(y) === 0 ? " " : "█";
         }
-        imageData.push(ys.map(cell => cell === undefined ? " " : cell).join(''));
+        imageData.push(ys.map(cell => cell === undefined ? " " : cell)
+            .reduce((str, char) => str + char), ""); // join totally doesn't work as advertised
     }
 
     console.log(imageData);
