@@ -15,23 +15,61 @@ const Dir = {
 };
 const dirsClockwise = [Dir.UP, Dir.LEFT, Dir.DOWN, Dir.RIGHT];
 
+class Grid {
+    constructor() {
+        this.grid = new Map();
+    }
+
+    put(x, y, colour) {
+        if (!this.grid.has(x)) {
+            this.grid.set(x, new Map());
+        }
+
+        this.grid.get(x).set(y, colour);
+    }
+
+    get(x, y) {
+        const row = this.grid.get(x);
+        if (row === undefined) return 0; // black (default)
+        return row.get(y);
+    }
+
+    get size() {
+        let tot = 0;
+        for (const row of this.grid.keys()) {
+            tot += this.grid.get(row).size;
+        }
+        return tot;
+    }
+}
+
 class Robot {
     constructor() {
-        this.pos = [0,0];
+        this.x = 0;
+        this.y = 0;
         this.facing = Dir.UP;
     }
 
     rotLeft() {
-        this.move((dirsClockwise.indexOf(this.facing) - 1) % dirsClockwise.length);
-        this.pos = [this.pos[0], this.pos[1] + 1];
+        const dirIndex = (dirsClockwise.indexOf(this.facing)
+            - 1
+            + dirsClockwise.length
+        ) % dirsClockwise.length;
+
+        this.move(dirsClockwise[dirIndex]);
     }
 
     rotRight() {
-        this.move((dirsClockwise.indexOf(this.facing) + 1) % dirsClockwise.length);
-        this.pos = [this.pos[0], this.pos[1] - 1];
+        const dirIndex = (dirsClockwise.indexOf(this.facing)
+            + 1
+            + dirsClockwise.length
+        ) % dirsClockwise.length;
+
+        this.move(dirsClockwise[dirIndex]);
     }
 
     move(dir) {
+        this.facing = dir;
         switch (dir) {
             case Dir.UP: return this.up();
             case Dir.DOWN: return this.down();
@@ -41,40 +79,38 @@ class Robot {
     }
 
     up() {
-        this.pos = [this.pos[0], this.pos[1] + 1];
+        this.y++;
     }
 
     down() {
-        this.pos = [this.pos[0], this.pos[1] - 1];
+        this.y--;
     }
 
     left() {
-        this.pos = [this.pos[0] - 1, this.pos[1]];
+        this.x--;
     }
 
     right() {
-        this.pos = [this.pos[0] + 1, this.pos[1]];
+        this.x++;
     }
 }
 
 part1();
 
-function eq([x1, y1], [x2, y2]) {
-    return x1 === x2 && y1 === y2;
-}
-
 function part1() {
-    const cells = [];
+    const grid = new Grid();
     const brain = new Program(code);
     const robot = new Robot();
 
     const outputter = brain.run();
 
     while (true) {
-        const { value: colour, done1 } = outputter.next();
+        const { value: colour, done: done1 } = outputter.next();
         if (done1) break;
-        const { value: move, done2 }  = outputter.next();
+        const { value: move, done: done2 } = outputter.next();
         if (done2) break;
+
+        grid.put(robot.x, robot.y, colour);
 
         if (move === 0) {
             robot.rotLeft();
@@ -82,19 +118,24 @@ function part1() {
             robot.rotRight();
         }
 
-        if (colour === 1) {
-            cells.push({
-                pos: robot.pos,
-                col: colour,
-            });
-        }
+        brain.input(grid.get(robot.x, robot.y));
     }
 
-    cells.reduce((uniqueCells, nextCell) => uniqueCells.findIndex(
-        uniqueCell => eq(uniqueCell.pos, nextCell.pos)
-    ), []);
 
-    console.log(cells);
+    console.log(grid.size);
+
+    // const poop = cells.reduce((uniqueCells, nextCell) => {
+    //     const index = uniqueCells.findIndex(
+    //         uniqueCell => eq(uniqueCell.pos, nextCell.pos)
+    //     );
+    //     if (index !== -1) {
+    //         return uniqueCells.push(nextCell);
+    //     }
+
+    //     return uniqueCells;
+    // }, []);
+
+    // console.log(poop, poop.length);
 }
 
 function makeImage(finalImage, width, height) {
