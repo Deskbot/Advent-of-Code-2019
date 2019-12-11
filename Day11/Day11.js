@@ -172,8 +172,13 @@ function part2() {
         for (const y of grid.grid.get(x).keys()) {
             ys[y + yOffset] = grid.grid.get(x).get(y) === 0 ? " " : "█";
         }
-        imageData.push(ys.map(cell => cell === undefined ? " " : cell)
-            .reduce((str, char) => str + char), ""); // join totally doesn't work as advertised
+
+        yChars = [];
+        for (let [i,char] of ys.entries()) { // have to look at the indexes individually because .map distringuishes between undefined and empty list item
+            yChars[i] = char === undefined ? " " : char;
+        }
+
+        imageData.push(yChars.join(''));
     }
 
     console.log(imageData);
