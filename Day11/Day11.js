@@ -148,6 +148,8 @@ function part2() {
     const outputter = brain.run();
 
     while (true) {
+        brain.input(grid.get(robot.x, robot.y));
+
         const { value: colour, done: done1 } = outputter.next();
         if (done1) break;
         const { value: move, done: done2 } = outputter.next();
@@ -160,8 +162,6 @@ function part2() {
         } else {
             robot.rotRight();
         }
-
-        brain.input(grid.get(robot.x, robot.y));
     }
 
     const { minX, minY } = grid;
@@ -181,5 +181,5 @@ function part2() {
         imageData.push(yChars.join(''));
     }
 
-    console.log(imageData);
+    console.log(imageData.join("\n"));
 }
