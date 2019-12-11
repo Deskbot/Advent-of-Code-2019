@@ -1,4 +1,3 @@
-const bmpjs = require("bmp-js");
 const fs = require("fs");
 const { Program } = require("./IntCode");
 
@@ -96,6 +95,7 @@ class Robot {
 }
 
 part1();
+part2();
 
 function part1() {
     const grid = new Grid();
@@ -121,44 +121,42 @@ function part1() {
         brain.input(grid.get(robot.x, robot.y));
     }
 
-
     console.log(grid.size);
-
-    // const poop = cells.reduce((uniqueCells, nextCell) => {
-    //     const index = uniqueCells.findIndex(
-    //         uniqueCell => eq(uniqueCell.pos, nextCell.pos)
-    //     );
-    //     if (index !== -1) {
-    //         return uniqueCells.push(nextCell);
-    //     }
-
-    //     return uniqueCells;
-    // }, []);
-
-    // console.log(poop, poop.length);
 }
 
-function makeImage(finalImage, width, height) {
-    finalImage = finalImage.map((pixel) => {
-        switch (pixel) {
-            case 0: return 0x00000000;
-            case 1: return 0x00FFFFFF;
+function part2() {
+    const grid = new Grid();
+    const brain = new Program(code);
+    const robot = new Robot();
+
+    grid.put(0, 0, 1); // the starting pos is white
+    const outputter = brain.run();
+
+    while (true) {
+        const { value: colour, done: done1 } = outputter.next();
+        if (done1) break;
+        const { value: move, done: done2 } = outputter.next();
+        if (done2) break;
+
+        grid.put(robot.x, robot.y, colour);
+
+        if (move === 0) {
+            robot.rotLeft();
+        } else {
+            robot.rotRight();
         }
-        return 0xFF000000;
-    });
 
-    const data = Buffer.alloc(layers.length * pixelsInLayer * 32);
-
-    let offset = 0;
-    for (const pixel of finalImage) {
-        offset = data.writeUInt32BE(pixel, offset);
+        brain.input(grid.get(robot.x, robot.y));
     }
 
-    const bmp = bmpjs.encode({
-        data,
-        width,
-        height,
-    });
+    const imageData = [];
+    for (const x of grid.grid.keys()) {
+        const ys = []
+        for (const y of grid.grid.get(x).keys()) {
+            ys[y] = grid.grid.get(x).get(y) === 0 ? " " : "█";
+        }
+        imageData.push(ys.map(cell => cell === undefined ? " " : cell).join(''));
+    }
 
-    fs.writeFileSync("output.bmp", bmp.data);
+    console.log(imageData);
 }
