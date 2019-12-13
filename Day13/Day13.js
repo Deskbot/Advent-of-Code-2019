@@ -1,3 +1,4 @@
+const q = require("q");
 const fs = require("fs");
 const { Program } = require("./IntCode");
 const { Grid } = require("./Grid");
@@ -57,6 +58,7 @@ function part2() {
     const game = new Program(code);
     const runner = game.run();
     const screen = new Grid();
+    let defer = q.defer();
     let move;
 
     game.state[0] = 2;
@@ -69,16 +71,28 @@ function part2() {
             move = ch === "a" ? -1
                 : ch === "d" ? 1
                 : 0;
+
+            game.input(move);
+            defer.resolve(step(runner));
         });
         let stepNumber = 0;
         let score = 0;
 
         while (true) {
             try {
-                const result = await stepWithInput(stepNumber);
-                if (result !== undefined) {
-                    score = result;
+                if (stepNumber < 836) {
+                    const result = step(stepNumber);
+                    if (result !== undefined) {
+                        score = result;
+                    }
+                } else {
+                    const result = await defer.promise;
+                    if (result !== undefined) {
+                        score = result;
+                    }
+                    defer = q.defer();
                 }
+
                 stepNumber++;
             } catch (e) {
                 break;
@@ -86,24 +100,6 @@ function part2() {
         }
 
         console.log(score);
-    }
-
-
-    function stepWithInput(stepNumber) {
-        return new Promise((resolve, reject) => {
-            if (stepNumber < 836) {
-                return resolve();
-            }
-
-            rl.question(screen.toString(), () => {
-                game.input(move);
-                const result = step(runner);
-                if (result === "done") {
-                    return reject();
-                }
-                resolve(result);
-            });
-        });
     }
 
     function step(runner) {
