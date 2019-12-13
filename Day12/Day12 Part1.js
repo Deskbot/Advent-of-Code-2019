@@ -14,7 +14,6 @@ const moonStartStates = {
 };
 
 part1();
-part2();
 
 function allPairs(list) {
     return list.flatMap((item, i) => {
@@ -79,37 +78,4 @@ function part1() {
         .reduce((tot, moon) => tot + energy(moon), 0);
 
     console.log(totalMoonEnergy);
-}
-
-
-function moonStatesAreEqual(moons1, moons2) {
-    for (const moonName in moons1) {
-        if (moonsEqual(moons1[moonName], moons2[moonName])) {
-            return false;
-        }
-    }
-    return true;
-}
-
-function moonsEqual(m1, m2) {
-    for (const axis of axes) {
-        if (m1[axis] !== m2[axis]) return false;
-    }
-
-    return true;
-}
-
-function part2() {
-    let moons = deepCopy(moonStartStates);
-
-    for (var i = 1; i < Infinity; i++) {
-        moons = applyGravity(moons);
-        moons = applyVelocity(moons);
-
-        if (moonStatesAreEqual(moons, moonStartStates)) {
-            break;
-        }
-    }
-
-    console.log(i);
 }
