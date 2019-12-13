@@ -15,26 +15,31 @@ const idToChar = {
     4: "O",
 };
 
-const game = new Program(code);
-const runner = game.run();
-const screen = new Grid();
+part1();
 
-function step() {
-    const { value: x, done } = runner.next();
-    if (done) return "stop";
-    const { value: y } = runner.next();
-    const { value: id } = runner.next();
+function part1() {
+    const game = new Program(code);
+    const runner = game.run();
+    const screen = new Grid();
 
-    screen.put(x, y, idToChar[id]);
-}
+    function step() {
+        const { value: x, done } = runner.next();
+        if (done) return "stop";
+        const { value: y } = runner.next();
+        const { value: id } = runner.next();
 
-const i = setInterval(() => {
-    if (step()) {
-        clearInterval(i);
-        const finalScreen = screen.toString();
-        console.log(finalScreen);
-        console.log(finalScreen.match(/B/g).length);
+        screen.put(x, y, idToChar[id]);
     }
 
-    console.log(screen.toString());
-}, 1);
+    const i = setInterval(() => {
+        if (step()) {
+            clearInterval(i);
+            const finalScreen = screen.toString();
+            console.log(finalScreen);
+            console.log(finalScreen.match(/B/g).length);
+        }
+
+        console.log(screen.toString());
+    }, 1);
+
+}
