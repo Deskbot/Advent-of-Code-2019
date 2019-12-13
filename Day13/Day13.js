@@ -1,4 +1,3 @@
-const q = require("q");
 const fs = require("fs");
 const { Program } = require("./IntCode");
 const { Grid } = require("./Grid");
@@ -49,58 +48,28 @@ function part1() {
     }, 1);
 }
 
-function part2() {
-    const rl = readline.createInterface({
-        input: process.stdin,
-        output: process.stdout
-    });
 
+function part2() {
     const game = new Program(code);
     const runner = game.run();
     const screen = new Grid();
-    let defer = q.defer();
-    let move;
+    let score = 0;
 
     game.state[0] = 2;
 
-    play();
+    readline.emitKeypressEvents(process.stdin);
+    process.stdin.setRawMode(true);
+    process.stdin.on("keypress", (ch, key) => {
+        let move = ch === "a" ? -1
+            : ch === "d" ? 1
+            : 0;
 
-    async function play() {
-        process.stdin.setRawMode(true);
-        process.stdin.on("keypress", (ch, key) => {
-            move = ch === "a" ? -1
-                : ch === "d" ? 1
-                : 0;
-
-            game.input(move);
-            defer.resolve(step(runner));
-        });
-        let stepNumber = 0;
-        let score = 0;
-
-        while (true) {
-            try {
-                if (stepNumber < 836) {
-                    const result = step(stepNumber);
-                    if (result !== undefined) {
-                        score = result;
-                    }
-                } else {
-                    const result = await defer.promise;
-                    if (result !== undefined) {
-                        score = result;
-                    }
-                    defer = q.defer();
-                }
-
-                stepNumber++;
-            } catch (e) {
-                break;
-            }
-        }
-
+        game.input(move);
+        step(runner)
+        console.log(screen.toString());
         console.log(score);
-    }
+    });
+
 
     function step(runner) {
         const { value: x, done } = runner.next();
