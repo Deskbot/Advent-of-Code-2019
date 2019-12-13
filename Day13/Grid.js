@@ -4,17 +4,17 @@ class Grid {
     }
 
     put(x, y, value) {
-        if (!this.grid.has(x)) {
-            this.grid.set(x, new Map());
+        if (!this.grid.has(y)) {
+            this.grid.set(y, new Map());
         }
 
-        this.grid.get(x).set(y, value);
+        this.grid.get(y).set(x, value);
     }
 
     get(x, y) {
-        const row = this.grid.get(x);
+        const row = this.grid.get(y);
         if (row === undefined) return 0; // black (default)
-        return row.get(y);
+        return row.get(x);
     }
 
     get size() {
@@ -26,32 +26,28 @@ class Grid {
     }
 
     get minX() {
-        return [...this.grid.keys()].sort()[0];
-    }
-
-    get minY() {
         return [...this.grid.keys()]
-            .map(x => this.grid.get(x)) // list of y maps
-            .map(ymap => [...ymap.keys()].sort(lowHigh)[0]) // list of minys
-            .sort(lowHigh)[0]; // miny
+            .map(y => this.grid.get(y)) // list of x maps
+            .map(xmap => [...xmap.keys()].sort(lowHigh)[0]) // list of minx for each y
+            .sort(lowHigh)[0]; // minx
     }
 
     toString() {
-        const { minY } = this;
-        let yOffset = minY < 0 ? Math.abs(minY) : 0;
+        const { minX } = this;
+        let xOffset = minX < 0 ? Math.abs(minX) : 0;
         const arr = [];
-        for (const x of [...this.grid.keys()].sort(lowHigh)) {
-            const ys = []
-            for (const y of this.grid.get(x).keys()) {
-                ys[y + yOffset] = this.grid.get(x).get(y);
+        for (const y of [...this.grid.keys()].sort(lowHigh)) {
+            const xs = []
+            for (const x of this.grid.get(y).keys()) {
+                xs[x + xOffset] = this.grid.get(y).get(x);
             }
 
-            let yChars = [];
-            for (let [i, char] of ys.entries()) { // have to look at the indexes individually because .map distringuishes between undefined and empty list item
-                yChars[i] = char === undefined ? " " : char;
+            let xChars = [];
+            for (let [i, char] of xs.entries()) { // have to look at the indexes individually because .map distringuishes between undefined and empty list item
+                xChars[i] = char === undefined ? " " : char;
             }
 
-            arr.push(yChars.join(''));
+            arr.push(xChars.join(''));
         }
 
         return arr.join("\n");
