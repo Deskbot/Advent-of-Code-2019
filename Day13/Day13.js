@@ -55,7 +55,12 @@ function part2() {
     const screen = new Grid();
     let score = 0;
 
-    game.state[0] = 2;
+    game.state.set(2);
+
+    // skip the setup
+    for (let i = 1; i <= 896; i++) {
+        step(runner);
+    }
 
     readline.emitKeypressEvents(process.stdin);
     process.stdin.setRawMode(true);
