@@ -1,6 +1,7 @@
 const fs = require("fs");
 const { Program } = require("./IntCode");
 const { Grid } = require("./Grid");
+const readline = require('readline');
 
 const file = fs.readFileSync("input.txt").toString();
 const code = file.split(",")
@@ -45,18 +46,56 @@ function part1() {
 }
 
 function part2() {
+    const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout
+    });
+
     const game = new Program(code);
     const runner = game.run();
     const screen = new Grid();
     let score = 0;
-    let joyPos = 0;
 
     game.state[0] = 2;
 
-    while (true) {
+    play();
+
+    async function play() {
+        while (true) {
+            try {
+                const s = await stepWithInput();
+                score = s;
+            } catch (e) {
+                break;
+            }
+        }
+
+        console.log(score);
+    }
+
+
+    function stepWithInput() {
+        return new Promise((resolve, reject) => {
+            rl.question(screen.toString(), (move) => {
+                const moveCode = move === "a" ? -1
+                    : move === "d" ? 1
+                    : 0;
+
+                game.input(moveCode);
+                if (step(game, runner)) {
+                    return reject();
+                }
+
+                rl.close();
+                resolve();
+            });
+        });
+    }
+
+    function step(game, runner) {
         game.input(joyPos);
         const { value: x, done } = runner.next();
-        if (done) break;
+        if (done) return "done";
         const { value: y } = runner.next();
         const { value: id } = runner.next();
 
@@ -65,8 +104,5 @@ function part2() {
         } else {
             screen.put(x, y, idToChar[id]);
         }
-
     }
-
-    console.log(score);
 }
