@@ -23,6 +23,7 @@ function part1() {
     const game = new Program(code);
     const runner = game.run();
     const screen = new Grid();
+    let steps = 0;
 
     function step() {
         const { value: x, done } = runner.next();
@@ -30,6 +31,7 @@ function part1() {
         const { value: y } = runner.next();
         const { value: id } = runner.next();
 
+        steps++;
         screen.put(x, y, idToChar[id]);
     }
 
@@ -42,6 +44,7 @@ function part1() {
         }
 
         console.log(screen.toString());
+        console.log(steps);
     }, 1);
 }
 
@@ -54,17 +57,22 @@ function part2() {
     const game = new Program(code);
     const runner = game.run();
     const screen = new Grid();
-    let score = 0;
 
     game.state[0] = 2;
 
     play();
 
     async function play() {
+        let stepNumber = 0;
+        let score = 0;
+
         while (true) {
             try {
-                const s = await stepWithInput();
-                score = s;
+                const result = await stepWithInput(stepNumber);
+                if (result !== undefined) {
+                    score = result;
+                }
+                stepNumber++;
             } catch (e) {
                 break;
             }
@@ -74,33 +82,37 @@ function part2() {
     }
 
 
-    function stepWithInput() {
+    function stepWithInput(stepNumber) {
         return new Promise((resolve, reject) => {
+            if (stepNumber < 836) {
+                return resolve();
+            }
+
             rl.question(screen.toString(), (move) => {
                 const moveCode = move === "a" ? -1
                     : move === "d" ? 1
                     : 0;
 
                 game.input(moveCode);
-                if (step(game, runner)) {
+                const result = step(runner);
+                if (result === "done") {
                     return reject();
                 }
 
                 rl.close();
-                resolve();
+                resolve(result);
             });
         });
     }
 
-    function step(game, runner) {
-        game.input(joyPos);
+    function step(runner) {
         const { value: x, done } = runner.next();
         if (done) return "done";
         const { value: y } = runner.next();
         const { value: id } = runner.next();
 
         if (x === -1 && y === 0) {
-            score = id;
+            return id;
         } else {
             screen.put(x, y, idToChar[id]);
         }
