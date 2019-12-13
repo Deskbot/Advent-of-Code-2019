@@ -57,12 +57,19 @@ function part2() {
     const game = new Program(code);
     const runner = game.run();
     const screen = new Grid();
+    let move;
 
     game.state[0] = 2;
 
     play();
 
     async function play() {
+        process.stdin.setRawMode(true);
+        process.stdin.on("keypress", (ch, key) => {
+            move = ch === "a" ? -1
+                : ch === "d" ? 1
+                : 0;
+        });
         let stepNumber = 0;
         let score = 0;
 
@@ -88,18 +95,12 @@ function part2() {
                 return resolve();
             }
 
-            rl.question(screen.toString(), (move) => {
-                const moveCode = move === "a" ? -1
-                    : move === "d" ? 1
-                    : 0;
-
-                game.input(moveCode);
+            rl.question(screen.toString(), () => {
+                game.input(move);
                 const result = step(runner);
                 if (result === "done") {
                     return reject();
                 }
-
-                rl.close();
                 resolve(result);
             });
         });
