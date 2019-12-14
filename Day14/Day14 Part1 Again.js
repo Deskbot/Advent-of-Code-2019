@@ -1,7 +1,7 @@
 const fs = require("fs");
 const { Bag } = require("./Bag");
 
-const file = fs.readFileSync("input2.txt").toString();
+const file = fs.readFileSync("input.txt").toString();
 
 const rules = new Map();
 file.split("\n")
@@ -46,12 +46,13 @@ function oreToMake(resource, qtyWanted, onHand) {
 
     let ore = 0;
     for (const recipie of recipies) {
-        ore += oreToMake(recipie.name, recipie.qty, onHand);
+        ore += oreToMake(recipie.name, recipie.qty * numOfBatches, onHand);
     }
 
     onHand.add(resource, leftOver);
 
-    return ore * numOfBatches;
+    // console.log(resource, qty, numOfBatches, ore, ore * numOfBatches);
+    return ore;
 }
 
 console.log(oreToMake("FUEL", 1, new Bag()));
