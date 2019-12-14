@@ -27,12 +27,12 @@ file.split("\n")
         });
     });
 
-function oreToMake(resource, qty, onHand) {
+function oreToMake(resource, qtyWanted, onHand) {
     const qtyAlready = onHand.get(resource);
 
     // number that actually need to be made
-    qty = Math.max(qty - qtyAlready, 0);
-    onHand.map.set(resource, Math.max(qtyAlready - qty, 0));
+    const qty = Math.max(qtyWanted - qtyAlready, 0);
+    onHand.map.set(resource, Math.max(qtyAlready - qtyWanted, 0));
 
     if (qty === 0) return 0;
 
