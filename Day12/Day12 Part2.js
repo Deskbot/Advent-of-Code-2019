@@ -14,7 +14,7 @@ const moonStartStates = {
 };
 
 const allPairsOfMoonNames = allPairs(Object.keys(moonStartStates));
-const axis = "x"
+let axis = "x"
 
 part2();
 
@@ -22,6 +22,43 @@ function allPairs(list) {
     return list.flatMap((item, i) => {
         return list.slice(i + 1).map(otherItem => [item, otherItem]);
     });
+}
+
+function increment(tick, axis, moons) {
+    const smallestGap = Math.min(...allPairsOfMoonNames
+        .map(([m1,m2]) => {
+            return Math.abs(moons[m1].pos[axis] - moons[m2].pos[axis]);
+        }));
+
+    // apply gravity
+    const newMoons = deepCopy(moons);
+    for (const [m1, m2] of allPairsOfMoonNames) {
+        if (moons[m1].pos[axis] < moons[m2].pos[axis]) {
+            newMoons[m1].vel[axis] += smallestGap;
+            newMoons[m2].vel[axis] -= smallestGap;
+        } else if (moons[m1].pos[axis] > moons[m2].pos[axis]) {
+            newMoons[m1].vel[axis] -= smallestGap;
+            newMoons[m2].vel[axis] += smallestGap;
+        }
+    }
+
+    for (const moonName in newMoons) {
+        const currentVel = moons[moonName].vel[axis];
+        newMoons[moonName].pos[axis] += sumOfNumsBetween(currentVel, currentVel + smallestGap);
+    }
+
+    if (moonStatesAreEqual(moons, newMoons)) {
+        console.log(tick, smallestGap, tick + smallestGap);
+        return tick + smallestGap;
+    }
+
+    return increment(tick + smallestGap, axis, newMoons);
+}
+
+// a simplified version of subtracting triangle nums to a
+// from triangle nums to b
+function sumOfNumsBetween(a, b) {
+    return (b * b - a * a + b - a) / 2;
 }
 
 function applyGravity(moons) {
@@ -41,7 +78,7 @@ function applyGravity(moons) {
 }
 
 function applyVelocity(moons) {
-    const newMoons = deepCopy(moons);
+    // const newMoons = deepCopy(moons); // ???
     for (const moonName in newMoons) {
         newMoons[moonName].pos[axis] += moons[moonName].vel[axis];
         // for (axis of axes) {
@@ -75,9 +112,6 @@ function deepCopy(obj) {
 
     return ret;
 }
-// function deepCopy(basicObject) {
-//     return JSON.parse(JSON.stringify(basicObject));
-// }
 
 function moonStatesAreEqual(moons1, moons2) {
     for (const moonName in moons1) {
@@ -94,8 +128,6 @@ function moonsEqual(m1, m2) {
     ) {
         return false;
     }
-    // for (const axis of axes) {
-    // }
 
     return true;
 }
@@ -103,22 +135,23 @@ function moonsEqual(m1, m2) {
 function part2() {
     let moons = deepCopy(moonStartStates);
     let time = new Date().getTime();
+    axis = "x";
 
-    for (var i = 1; i < Infinity; i++) {
-        moons = applyGravity(moons);
-        moons = applyVelocity(moons);
+    console.log(increment(0, "x", moons));
 
-        if (moonStatesAreEqual(moons, moonStartStates)) {
-            break;
-        }
+    // for (var i = 1; i < Infinity; i++) {
+    //     moons = applyGravity(moons);
+    //     moons = applyVelocity(moons);
 
-        if (i % 1000 < 1) {
-            console.log(i)
-            const newTime = new Date().getTime();
-            console.log(newTime - time);
-            time = newTime;
-        }
-    }
+    //     if (moonStatesAreEqual(moons, moonStartStates)) {
+    //         console.log(i);
+    //     }
 
-    console.log(i);
+    //     // if (i % 1000 < 1) {
+    //     //     console.log(i)
+    //     //     const newTime = new Date().getTime();
+    //     //     console.log(newTime - time);
+    //     //     time = newTime;
+    //     // }
+    // }
 }
