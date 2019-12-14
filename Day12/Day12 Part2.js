@@ -102,7 +102,6 @@ function moonsEqual(m1, m2) {
 }
 
 function part2() {
-    const allMoonStates = [moonStartStates];
     let moons = deepCopy(moonStartStates);
     let time = new Date().getTime();
 
@@ -110,13 +109,9 @@ function part2() {
         moons = applyGravity(moons);
         moons = applyVelocity(moons);
 
-        for (const prevState of allMoonStates) {
-            if (moonStatesAreEqual(moons, prevState)) {
-                break;
-            }
+        if (moonStatesAreEqual(moons, moonStartStates)) {
+            break;
         }
-
-        allMoonStates.push(moons);
 
         if (i % 1000 < 1) {
             console.log(i)
