@@ -1,6 +1,6 @@
 class Bag {
-    constructor() {
-        this.map = new Map();
+    constructor(map) {
+        this.map = map ? map : new Map();
     }
 
     add(key, val) {
@@ -16,6 +16,10 @@ class Bag {
         const val = this.map.get(key);
         if (val === undefined) return 0;
         return val;
+    }
+
+    clone() {
+        return new Bag(new Map(this.map.entries()));
     }
 }
 

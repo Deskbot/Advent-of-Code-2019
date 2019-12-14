@@ -20,6 +20,7 @@ file.split("\n")
             }
         });
 
+    if (rules.has(outName)) console.log("Oh no");
     rules.set(outName, {
         qtyOut: parseInt(outNum),
         ingredients: inputs,
