@@ -13,6 +13,7 @@ const moonStartStates = {
     "Callisto": { pos: { x: 2, y: 19, z: 15 }, vel: { x: 0, y: 0, z: 0 } }
 };
 
+const allPairsOfMoonNames = allPairs(Object.keys(moonStartStates));
 const axis = "x"
 
 part2();
@@ -22,8 +23,6 @@ function allPairs(list) {
         return list.slice(i + 1).map(otherItem => [item, otherItem]);
     });
 }
-
-const allPairsOfMoonNames = allPairs(Object.keys(moonStartStates));
 
 function applyGravity(moons) {
     const newMoons = deepCopy(moons);
