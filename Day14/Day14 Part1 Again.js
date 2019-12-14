@@ -30,22 +30,26 @@ file.split("\n")
 function oreToMake(resource, qty, onHand) {
     const qtyAlready = onHand.get(resource);
 
-    onHand = onHand.clone();
+    // number that actually need to be made
+    qty = Math.max(qty - qtyAlready, 0);
     onHand.map.set(resource, Math.max(qtyAlready - qty, 0));
-    qty -= qtyAlready;
 
-    qty - onHand.get(resource);
+    if (qty === 0) return 0;
+
     if (resource === "ORE") {
         return qty;
     }
 
     const { qtyOut, recipies } = rules.get(resource);
     const numOfBatches = Math.ceil(qty / qtyOut);
+    const leftOver = numOfBatches * qtyOut - qty;
 
     let ore = 0;
     for (const recipie of recipies) {
         ore += oreToMake(recipie.name, recipie.qty, onHand);
     }
+
+    onHand.add(resource, leftOver);
 
     return ore * numOfBatches;
 }
