@@ -23,9 +23,11 @@ function allPairs(list) {
     });
 }
 
+const allPairsOfMoonNames = allPairs(Object.keys(moonStartStates));
+
 function applyGravity(moons) {
     const newMoons = deepCopy(moons);
-    for (const [m1, m2] of allPairs(Object.keys(newMoons))) {
+    for (const [m1, m2] of allPairsOfMoonNames) {
         if (moons[m1].pos[axis] < moons[m2].pos[axis]) {
             newMoons[m1].vel[axis]++;
             newMoons[m2].vel[axis]--;
