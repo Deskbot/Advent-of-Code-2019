@@ -27,6 +27,9 @@ file.split("\n")
         });
     });
 
+part1();
+part2();
+
 function oreToMake(resource, qtyWanted, onHand) {
     const qtyAlready = onHand.get(resource);
 
@@ -55,4 +58,61 @@ function oreToMake(resource, qtyWanted, onHand) {
     return ore;
 }
 
-console.log(oreToMake("FUEL", 1, new Bag()));
+function part1() {
+    console.log(oreToMake("FUEL", 1, new Bag()));
+}
+
+function part2() {
+    const trillion = 1000000000000;
+    let qtyOfFuelToAttempt = Math.floor(trillion / 97422);
+    // let maxFuelPossible = -Infinity;
+    // let minFuelPossible = Infinity;
+
+    // while (true) {
+    //     const oreRequired = oreToMake("FUEL", qtyOfFuelToAttempt, new Bag());
+
+    //     if (oreRequired === trillion) {
+    //         break;
+    //     }
+
+    //     if (oreRequired > trillion) {
+
+    //     }
+    // }
+
+    console.log(
+        binSearch(
+            qty => oreToMake("FUEL", qty, new Bag()),
+            0,
+            trillion,
+            trillion,
+            qtyOfFuelToAttempt
+        )
+    );
+}
+
+function binSearch(provider, min, max, target, input) {
+    return search(input, min, max);
+
+    function search(input, min, max) {
+        const found = provider(input);
+
+        if (min === max) {
+            return input;
+        }
+
+        if (found === target) return input;
+
+        if (found > target) {
+            // smaller input
+            return search(halfway(min, input - 1), min, input - 1);
+        } else {
+            // bigger input
+            return search(halfway(max, input + 1), input + 1, max);
+        }
+    }
+
+    function halfway(left, right) {
+        return Math.floor((left + right) / 2);
+    }
+}
