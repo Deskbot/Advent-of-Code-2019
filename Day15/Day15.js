@@ -3,12 +3,26 @@ const readline = require('readline');
 const { Program } = require("../IntCode");
 const { World } = require("./World");
 
-const keyToDir = {
-    w: 1,
-    s: 2,
-    a: 3,
-    d: 4,
-};
+const oppositeDir = {
+    1: 2,
+    2: 1,
+    3: 4,
+    4: 3,
+}
+
+const leftOf = {
+    1: 3,
+    2: 4,
+    3: 2,
+    4: 1,
+}
+
+const rightOf = {
+    1: 4,
+    2: 3,
+    3: 1,
+    4: 2,
+}
 
 const code = fs.readFileSync("input.txt").toString()
     .split(",")
@@ -18,22 +32,35 @@ const code = fs.readFileSync("input.txt").toString()
 const game = new Program(code);
 const runner = game.run();
 
-readline.emitKeypressEvents(process.stdin);
-process.stdin.setRawMode(true);
-process.stdin.on("keypress", (ch, key) => {
-    if (key.name === "c" && key.ctrl) process.kill(process.pid, "SIGINT");
-
-    let move = keyToDir[ch];
-    game.input(move);
-    const done = step(runner, move);
-    console.log(world.grid.toString());
-});
-
 const world = new World();
+const moves = [];
+let moveDir = 1;
+let count = 0;
+
+while (true) {
+    count++;
+    console.log(world.grid.toString());
+    console.log(moves.length)
+
+    game.input(moveDir);
+
+    const status = step(runner, moveDir);
+
+    if (status === 2 || status === true) break;
+
+    if (status === 0) {
+        moveDir = rightOf[moveDir];
+    } else {
+        moveDir = leftOf[moveDir];
+    }
+}
+
+console.log(world.grid.toString());
+console.log(moves);
+console.log(moves.length + 1) // dunno why I need to add 1, tried it and it was right
+
 function step(runner, dir) {
     const { value: status, done } = runner.next();
-
-    console.log(status, dir);
 
     if (done) return true;
 
@@ -57,7 +84,13 @@ function step(runner, dir) {
         } else { // 4
             world.moveEast();
         }
-    } else {
-        return true;
+
+        if (dir === oppositeDir[moves[moves.length - 1]]) {
+            moves.pop();
+        } else {
+            moves.push(dir);
+        }
     }
+
+    return status;
 }
