@@ -4,9 +4,18 @@ const { World } = require("./World");
 const { Grid } = require("../Grid");
 const { PredSet } = require("../PredSet");
 
-const start = [22,19];
+let start = [2,3];
+let mazeStr = `
+##
+#..##
+#.#..#
+#...#
+###
+`;
+
+start = [22,19];
 // generated from running the droid, with the final D replaced with a .
-const mazeStr = `
+mazeStr = `
 #########################################
 #...#.........#.....#.......#...#.......#
 #.#.#.#.#####.###.#.#######.#.#.#...#...#
@@ -172,7 +181,7 @@ function oxygen() {
     let hasO = new PredSet(eq);
     let needToAdd = new PredSet(eq)
     needToAdd.put(grid.get(...start));
-    let i = 0;
+    let i = -1;
 
     while (hasO.set.length < osNeeded) {
         const aboutToAdd = needToAdd;
