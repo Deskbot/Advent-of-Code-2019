@@ -180,7 +180,7 @@ function oxygen() {
         for (const node of aboutToAdd) {
             const { neighbours } = node;
             const adjCells = neighbours.map(([x, y]) => grid.get(x, y));
-            needToAdd.push();
+            needToAdd.push(...adjCells.filter(c => !hasO.has(c)));
             hasO.put(node);
         }
 
