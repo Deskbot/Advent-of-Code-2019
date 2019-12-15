@@ -1,7 +1,10 @@
 const fs = require("fs");
 const { Program } = require("../IntCode");
 const { World } = require("./World");
+const { Grid } = require("../Grid");
+const { PredSet } = require("../PredSet");
 
+const start = [22,19];
 // generated from running the droid, with the final D replaced with a .
 const mazeStr = `
 #########################################
@@ -46,6 +49,8 @@ const mazeStr = `
 #.....#.............#.....#.....#.......#
  ##### ############# ##### ##### #######
 `
+
+const osNeeded = mazeStr.match(/\./g).length;
 
 // outputMaze();
 oxygen();
@@ -150,12 +155,12 @@ function oxygen() {
         .map(row => row.split('')
             .filter(char => char !== ''));
 
-    const spaceCells = [];
+    const grid = new Grid();
 
     for (const [y, row] of maze.entries()) {
         for (const [x, char] of row.entries()) {
             if (char === ".") {
-                spaceCells.push({
+                grid.put(x, y, {
                     x,
                     y,
                     neighbours: adjacentCells(maze, x, y),
@@ -164,14 +169,36 @@ function oxygen() {
         }
     }
 
+    let hasO = new PredSet(eq);
+    let needToAdd = [grid.get(...start)];
+    let i = 0;
 
+    while (hasO.set.length < osNeeded) {
+        const aboutToAdd = needToAdd;
+        needToAdd = [];
+
+        for (const node of aboutToAdd) {
+            const { neighbours } = node;
+            const adjCells = neighbours.map(([x, y]) => grid.get(x, y));
+            needToAdd.push();
+            hasO.put(node);
+        }
+
+        i++;
+    }
+
+    console.log(hasO.set.length, osNeeded, i);
 }
 
-function adjacentCells(grid, x, y) {
+function adjacentCells(maze, x, y) {
     return [
-        [x+1][y],
-        [x-1][y],
-        [x][y+1],
-        [x][y-1],
-    ].filter(([possX, possY]) => grid[possX][possY] === ".");
+        [x+1, y],
+        [x-1, y],
+        [x, y+1],
+        [x, y-1],
+    ].filter(([possX, possY]) => maze[possY][possX] === ".");
+}
+
+function eq(cell1, cell2) {
+    return cell1.x === cell2.x && cell1.y === cell2.y;
 }
