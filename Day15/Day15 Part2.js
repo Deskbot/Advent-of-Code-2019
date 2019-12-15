@@ -170,17 +170,19 @@ function oxygen() {
     }
 
     let hasO = new PredSet(eq);
-    let needToAdd = [grid.get(...start)];
+    let needToAdd = new PredSet(eq)
+    needToAdd.put(grid.get(...start));
     let i = 0;
 
     while (hasO.set.length < osNeeded) {
         const aboutToAdd = needToAdd;
-        needToAdd = [];
+        needToAdd = new PredSet(eq);
 
-        for (const node of aboutToAdd) {
+        for (const node of aboutToAdd.set) {
             const { neighbours } = node;
             const adjCells = neighbours.map(([x, y]) => grid.get(x, y));
-            needToAdd.push(...adjCells.filter(c => !hasO.has(c)));
+            adjCells.filter(c => !hasO.has(c))
+                .forEach(ac => needToAdd.put(ac))
             hasO.put(node);
         }
 
