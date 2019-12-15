@@ -3,7 +3,7 @@ const { Program } = require("../IntCode");
 const { World } = require("./World");
 
 // generated from running the droid, with the final D replaced with a .
-const maze = `
+const mazeStr = `
 #########################################
 #...#.........#.....#.......#...#.......#
 #.#.#.#.#####.###.#.#######.#.#.#...#...#
@@ -48,6 +48,7 @@ const maze = `
 `
 
 // outputMaze();
+oxygen();
 
 function outputMaze() {
     const oppositeDir = {
@@ -141,4 +142,36 @@ function outputMaze() {
 
         return status;
     }
+}
+
+function oxygen() {
+    const maze = mazeStr.split('\n')
+        .filter(char => char !== '')
+        .map(row => row.split('')
+            .filter(char => char !== ''));
+
+    const spaceCells = [];
+
+    for (const [y, row] of maze.entries()) {
+        for (const [x, char] of row.entries()) {
+            if (char === ".") {
+                spaceCells.push({
+                    x,
+                    y,
+                    neighbours: adjacentCells(maze, x, y),
+                });
+            }
+        }
+    }
+
+
+}
+
+function adjacentCells(grid, x, y) {
+    return [
+        [x+1][y],
+        [x-1][y],
+        [x][y+1],
+        [x][y-1],
+    ].filter(([possX, possY]) => grid[possX][possY] === ".");
 }
