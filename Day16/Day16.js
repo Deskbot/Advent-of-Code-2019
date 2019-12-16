@@ -3,15 +3,22 @@ const fs = require("fs");
 part1();
 
 function part1() {
-    let signal = fs.readFileSync("input.txt").toString()
+    let initialSignal = fs.readFileSync("input.txt").toString()
         .split("")
-        .filter(num => num !== "")
+        .filter(num => num.trim() !== "")
         .map(num => parseInt(num));
 
-    signal = [1,2,3,4,5,6,7,8];
+    // initialSignal = "80871224585914546619083218645595".split("").map(n => parseInt(n));
     const base = [0, 1, 0, -1];
 
-    console.log(phase(base, signal))
+    const finalSignal = new Array(100).fill(phase)
+        .map(phase => signal => phase(base, signal))
+        .reduce(
+            (acc, nextF) => nextF(acc),
+            initialSignal
+        );
+
+    console.log(finalSignal.join(''));
 }
 
 function* drop(n, itr) {
@@ -27,9 +34,9 @@ function oneDigit(num) {
 }
 
 function phase(base, signal) {
-    const phaseIterator = [...range(0, signal.length)]
-        .map(index => drop(1, pattern(base, index + 1), signal.length))
-        .map(itr => top(itr, signal.length))
+    const phaseIterator = [...range(1, signal.length + 1)]
+        .map(index => drop(1, pattern(base, index)))
+        .map(itr => top(signal.length, itr))
         .map(pattern => prodSum(pattern, signal.values()))
 
     return [...phaseIterator];
@@ -62,7 +69,7 @@ function* range(startWith, endBefore) {
     }
 }
 
-function* top(itr, n) {
+function* top(n, itr) {
     for (let i = 0; i < n; i++) {
         yield itr.next().value;
     }
