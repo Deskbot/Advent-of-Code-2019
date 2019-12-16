@@ -75,9 +75,3 @@ function* top(n, itr) {
         yield itr.next().value;
     }
 }
-
-function* zip(left, right) {
-    while (true) {
-        yield [left.next().value, right.next().value];
-    }
-}
