@@ -1,5 +1,7 @@
 const fs = require("fs");
 
+const base = [0, 1, 0, -1];
+
 part1();
 
 function part1() {
@@ -9,7 +11,6 @@ function part1() {
         .map(num => parseInt(num));
 
     // initialSignal = "80871224585914546619083218645595".split("").map(n => parseInt(n));
-    const base = [0, 1, 0, -1];
 
     const finalSignal = new Array(100).fill(phase)
         .map(phase => signal => phase(base, signal))
