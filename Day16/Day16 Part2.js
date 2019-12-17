@@ -19,7 +19,7 @@ class Repeat {
     }
 
     get(n) {
-        return this.list[n % this.times];
+        return this.list[n % this.list.length];
     }
 
     get length() {
